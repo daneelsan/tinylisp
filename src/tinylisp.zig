@@ -424,7 +424,7 @@ pub fn Lisp(comptime Reader: type, comptime Writer: type) type {
 
         const PrimitiveFunction = struct {
             sym: []const u8,
-            fun: * const fn (*Self, Expr, Expr) Expr,
+            fun: fn (*Self, Expr, Expr) Expr,
         };
         const primitive_funs = [_]PrimitiveFunction{
             .{ .sym = "eval", .fun = f_eval },
