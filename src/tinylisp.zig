@@ -20,12 +20,12 @@ const CLOS: I = 0x77FB;
 const NIL: I = 0x7FFC;
 
 inline fn unbox(x: Expr) I {
-    return @bitCast(I, x);
+    return @bitCast(x);
 }
 
 /// returns a new NaN-boxed f64 with tag t and ordinal i
 fn box(t: I, i: I) Expr {
-    return @bitCast(Expr, t << tag_shift | i);
+    return @bitCast(t << tag_shift | i);
 }
 
 /// tag(x) returns the tag bits of a NaN-boxed Lisp expression x
@@ -90,13 +90,13 @@ pub fn Lisp(comptime Reader: type, comptime Writer: type) type {
             l.writer = writer;
 
             // TODO: improve me
-            l.heap = @ptrCast([*]u8, @alignCast(@alignOf(u8), l.stack[0..]))[0..l.stack.len];
+            l.heap = @as([*]u8, @ptrCast(@alignCast(l.stack[0..])))[0..l.stack.len];
 
             l.err = l.atom("ERR");
             l.tru = l.atom("#t");
             l.env = l.pair(l.tru, l.tru, nil);
 
-            for (primitive_funs) |prim, i| {
+            for (primitive_funs, 0..) |prim, i| {
                 l.env = l.pair(l.atom(prim.sym), box(PRIM, i), l.env);
             }
 
@@ -424,7 +424,7 @@ pub fn Lisp(comptime Reader: type, comptime Writer: type) type {
 
         const PrimitiveFunction = struct {
             sym: []const u8,
-            fun: fn (*Self, Expr, Expr) Expr,
+            fun: *const fn (*Self, Expr, Expr) Expr,
         };
         const primitive_funs = [_]PrimitiveFunction{
             .{ .sym = "eval", .fun = f_eval },
@@ -591,7 +591,7 @@ pub fn Lisp(comptime Reader: type, comptime Writer: type) type {
             var trimmed_i: usize = undefined;
             var symbol_suffix: *const [3:0]u8 = undefined;
 
-            for (l.heap) |byte, i| {
+            for (l.heap, 0..) |byte, i| {
                 if (byte != 0) continue;
 
                 if (i == l.heap_ptr) {

@@ -33,25 +33,23 @@ Out[]= (1 . 2)
 
 ## Build
 
-Compiled using zig version 0.10.0:
+Compiled using zig version:
 ```shell
 $ zig version
-0.10.0
+0.11.0
 ```
 
 Compile the main.zig file using `zig build-exe`:
 ```shell
-$ zig build-exe -fstage1 src/main.zig
+$ zig build-exe src/main.zig
 
 $ ./main
 ```
 
 Or run it directly using `zig run`:
 ```shell
-$ zig run -fstage1 src/main.zig
+$ zig run src/main.zig
 ```
-
-Note that I'm using the `-fstage1` flag.
 
 ## TODO:
 
