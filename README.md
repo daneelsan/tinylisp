@@ -53,7 +53,6 @@ $ zig run src/main.zig
 
 ## TODO:
 
-- [] Don't use the `-fstage1` flag
 - [] Compile to .wasm and add a javascript REPL
 - [] Expand documentation
 
