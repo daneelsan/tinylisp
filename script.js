@@ -49,16 +49,49 @@ class Terminal {
         this.historyIndex = -1;
 
         this.initializeInputListener();
+        this.initializeAutoResize();
     }
 
     initializeInputListener() {
         this.input.addEventListener('keydown', (e) => this.handleInput(e));
     }
 
+    initializeAutoResize() {
+        this.input.addEventListener('input', () => this.autoResizeTextarea());
+    }
+
+    autoResizeTextarea() {
+        // Reset the height to auto to recalculate the height
+        this.input.style.height = 'auto';
+        // Set the height to the scrollHeight (content height)
+        this.input.style.height = `${this.input.scrollHeight}px`;
+    }
+
     handleInput(event) {
         if (event.key === 'Enter') {
-            this.processCommand(this.input.value.trim());
-            this.input.value = '';
+            // Check if Shift is pressed
+            if (!event.shiftKey) {
+                // Shift + Enter: Add a new line inside the textarea
+                const cursorPosition = this.input.selectionStart;
+                const value = this.input.value;
+                this.input.value = value.slice(0, cursorPosition) + '\n' + value.slice(cursorPosition);
+                this.input.setSelectionRange(cursorPosition + 1, cursorPosition + 1); // Move cursor to the new line
+                this.autoResizeTextarea(); // Resize the textarea
+                event.preventDefault();
+            } else {
+                // Enter: Send the command
+                this.processCommand(this.input.value.trim());
+                this.input.value = ''; // Clear the input field
+                this.autoResizeTextarea(); // Reset the textarea height
+                event.preventDefault(); // Prevent default behavior (e.g., form submission)
+            }
+        } else if (event.key === 'Tab') {
+            // Tab: Insert a tab character at the cursor position
+            const cursorPosition = this.input.selectionStart;
+            const value = this.input.value;
+            this.input.value = value.slice(0, cursorPosition) + '\t' + value.slice(cursorPosition);
+            this.input.setSelectionRange(cursorPosition + 1, cursorPosition + 1); // Move cursor after the tab
+            event.preventDefault(); // Prevent the browser's default behavior
         } else if (event.key === 'ArrowUp') {
             this.navigateHistory(-1);
         } else if (event.key === 'ArrowDown') {
@@ -73,7 +106,7 @@ class Terminal {
         this.historyIndex = this.commandHistory.length;
 
         // Display the command in green
-        this.appendOutput(`> ${input}`, 'output-command');
+        this.appendOutput(`λ ${input}`, 'output-command');
 
         // Handle meta commands
         if (input === '?help') {
@@ -102,7 +135,7 @@ class Terminal {
         inputArray.set(encodedInput);
 
         WASM.instance.exports.tinylisp_run(inputAddress, encodedInput.length);
-        this.appendOutput(terminalBuffer, 'output-result');
+        this.appendOutput(terminalBuffer.replace(/\t/g, '    '), 'output-result'); // Replace tabs with spaces
         terminalBuffer = "";
 
         // Free allocated memory
@@ -111,7 +144,7 @@ class Terminal {
 
     appendOutput(text, className = 'output-result') {
         const outputLine = document.createElement('div');
-        outputLine.textContent = text;
+        outputLine.textContent = text.replace(/\t/g, '    '); // Replace tabs with 4 spaces
         outputLine.className = className; // Apply the specified class
         this.output.appendChild(outputLine);
 

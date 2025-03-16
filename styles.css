@@ -21,7 +21,8 @@ body {
 }
 
 #output {
-    flex-grow: 0; /* Do not grow unnecessarily */
+    /* Do not grow unnecessarily */
+    flex-grow: 0;
     overflow-y: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -30,39 +31,65 @@ body {
 #input-line {
     flex-shrink: 0;
     display: flex;
-    margin-top: 10px; /* Add some spacing between output and input */
+    /* Add some spacing between output and input */
+    margin-top: 10px;
 }
 
 #banner {
-    color: #00ff00; /* Green color for the banner */
+    /* Green color for the banner */
+    color: #00ff00;
     margin-bottom: 10px;
 }
 
 #banner a {
-    color: #00ff00; /* Green color for the link */
+    /* Green color for the link */
+    color: #00ff00;
     text-decoration: underline;
 }
 
 #prompt {
     margin-right: 5px;
-    color: #00ff00; /* Green color for the prompt */
+    /* Green color for the prompt */
+    color: #00ff00;
+    font-weight: bold
 }
 
 #input {
     background: none;
     border: none;
-    color: #00ffff; /* Cyan color for the input */
+    /* Cyan color for the input */
+    color: #00ff00;
     outline: none;
     flex-grow: 1;
     font-family: monospace;
+    /* Allow text to wrap */
+    white-space: pre-wrap;
+    /* Disable resizing */
+    resize: none;
+    /* Hide scrollbar */
+    overflow: hidden;
+    /* Improve readability */
+    line-height: 1.5;
+    /* Remove padding */
+    padding: 0;
+    /* Remove margin */
+    margin: 0;
+    /* Allow dynamic height adjustment */
+    height: auto;
+    /* Minimum height for one line */
+    min-height: 1.5em;
+    /* Set the width of tab characters (optional) */
+    tab-size: 4;
 }
 
 /* Style for command output */
 .output-command {
-    color: #00ff00; /* Green color for commands */
+    /* Green color for commands */
+    color: #00ff00;
 }
 
 /* Style for command result */
 .output-result {
-    color: #00ffff; /* Cyan color for results */
+    /* Cyan color for results */
+    color: #00ffff;
 }

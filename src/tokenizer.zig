@@ -110,7 +110,7 @@ pub const Tokenizer = struct {
                     };
                     continue :state .invalid;
                 },
-                ' ', '\t', '\r' => {
+                ' ', '\t', '\r', '\n' => {
                     self.index += 1;
                     result.loc.start = self.index;
                     continue :state .start;

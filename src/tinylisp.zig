@@ -550,7 +550,7 @@ pub const Lisp = struct {
 
     fn printPRIM(l: *Lisp, x: Expr) !void {
         assert(tag(x) == PRIM);
-        try l.writer.print("< {s} >", .{primitive_fun(ord(x)).sym});
+        try l.writer.print("«{s}»", .{primitive_fun(ord(x)).sym});
     }
 
     fn printCONS(l: *Lisp, x: Expr) !void {
@@ -576,7 +576,7 @@ pub const Lisp = struct {
 
     fn printCLOS(l: *Lisp, x: Expr) !void {
         assert(tag(x) == CLOS);
-        try l.writer.print("<{d}>", .{ord(x)});
+        try l.writer.print("«{d}»", .{ord(x)});
     }
 
     fn printNUM(l: *Lisp, x: Expr) !void {
@@ -652,7 +652,7 @@ pub const Lisp = struct {
             switch (tag(x)) {
                 NIL => try l.writer.print("  NIL   |   {:>5}  |  {s}\n", .{ ord(x), "()" }),
                 ATOM => try l.writer.print("  ATOM  |  0x{X:0>4}  |  {s}\n", .{ ord(x), l.atomName(x) }),
-                PRIM => try l.writer.print("  PRIM  |   {:>5}  |  <{s}>\n", .{ ord(x), primitive_fun(ord(x)).sym }),
+                PRIM => try l.writer.print("  PRIM  |   {:>5}  |  «{s}»\n", .{ ord(x), primitive_fun(ord(x)).sym }),
                 CONS => try l.writer.print("  CONS  |   {:>5}  |\n", .{ord(x)}),
                 CLOS => try l.writer.print("  CLOS  |   {:>5}  |\n", .{ord(x)}),
                 else => try l.writer.print("        |          |  {d:<.10}\n", .{x}),
@@ -695,7 +695,7 @@ pub const Lisp = struct {
         const max_buffer_size = 1024; // TODO: use build options
         while (true) {
             defer l.garbageCollect();
-            try l.writer.print("In[]:= ", .{});
+            try l.writer.print("λ ", .{});
             // Read input
             var buffer = try std.BoundedArray(u8, max_buffer_size).init(0);
             try reader.streamUntilDelimiter(buffer.writer(), '\n', max_buffer_size);
@@ -704,7 +704,7 @@ pub const Lisp = struct {
             // Tokenize, parse and evaluate code
             const eval_expr = l.run(line[0 .. line.len - 1 :0]) orelse l.err;
             // Print result
-            try l.printReplOutput("Out[]= ", eval_expr);
+            try l.printReplOutput("", eval_expr);
         }
     }
 };
