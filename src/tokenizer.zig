@@ -155,7 +155,8 @@ pub const Tokenizer = struct {
                 self.index += 1;
                 switch (self.buffer[self.index]) {
                     0 => result.tag = .real,
-                    else => continue :state .real_fractional_part,
+                    '0'...'9' => continue :state .real_fractional_part,
+                    else => result.tag = .real,
                 }
             },
 
@@ -215,6 +216,13 @@ test "tokenizer - expressions" {
         .symbol,
         .real,
         .real,
+        .parenthesis_right,
+    });
+    try testTokenize("(= 1. 1)", &.{
+        .parenthesis_left,
+        .symbol,
+        .real,
+        .integer,
         .parenthesis_right,
     });
     try testTokenize("(x . y)", &.{
