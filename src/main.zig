@@ -3,9 +3,10 @@ const std = @import("std");
 const tinylisp = @import("tinylisp.zig");
 
 pub fn main() anyerror!void {
-    const reader = std.io.getStdIn().reader();
-    const writer = std.io.getStdOut().writer();
+    const reader = std.io.getStdIn().reader().any();
+    const writer = std.io.getStdOut().writer().any();
 
-    var lisp = tinylisp.Lisp(@TypeOf(reader), @TypeOf(writer)).init(reader, writer);
+    var lisp = tinylisp.Lisp{};
+    lisp.init(reader, writer);
     try lisp.repl();
 }
