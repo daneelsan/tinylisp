@@ -383,3 +383,5 @@ In[]:=
 
 ## Resources
 * [Lisp in 99 lines of C and how to write one yourself - Robert-van-Engelen](https://github.com/Robert-van-Engelen/tinylisp#lisp-in-99-lines-of-c-and-how-to-write-one-yourself)
+
+* [Passing strings to and from WebAssembly using C](https://log.schemescape.com/posts/webassembly/passing-strings-to-c.html)
