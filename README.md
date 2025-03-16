@@ -355,7 +355,7 @@ $ zig version
 
 Build the wasm executable using `zig build`:
 ```shell
-$ zig build local
+$ zig build
 
 $ ls zig-out/bin
 tinylisp.wasm
