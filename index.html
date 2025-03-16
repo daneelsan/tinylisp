@@ -2,20 +2,72 @@
 <html lang="en">
 
 <head>
+    <!-- Character Encoding -->
     <meta charset="UTF-8">
+
+    <!-- Viewport for Responsive Design -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TINYLISP Terminal</title>
+
+    <!-- Page Title (Important for SEO) -->
+    <title>TINYLISP Terminal - A Web-Based Lisp Interpreter</title>
+
+    <!-- Meta Description (Important for SEO) -->
+    <meta name="description" content="TINYLISP Terminal is a web-based Lisp interpreter. Write and execute Lisp code directly in your browser. Learn more about TINYLISP and its features.">
+
+    <!-- Keywords (Less important today, but still useful) -->
+    <meta name="keywords" content="TINYLISP, Lisp interpreter, web-based Lisp, Lisp terminal, Lisp programming, online Lisp">
+
+    <!-- Canonical URL (Prevent duplicate content issues) -->
+    <link rel="canonical" href="https://daneelsan.github.io/tinylisp/">
+
+    <!-- Favicon (Improves user experience and branding) -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Open Graph Meta Tags (For Social Media Sharing) -->
+    <meta property="og:title" content="TINYLISP Terminal - A Web-Based Lisp Interpreter">
+    <meta property="og:description" content="TINYLISP Terminal is a web-based Lisp interpreter. Write and execute Lisp code directly in your browser. Learn more about TINYLISP and its features.">
+    <meta property="og:image" content="https://github.com/daneelsan/tinylisp/blob/main/screenshot.png">
+    <meta property="og:url" content="https://daneelsan.github.io/tinylisp/">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Meta Tags (For Twitter Sharing) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TINYLISP Terminal - A Web-Based Lisp Interpreter">
+    <meta name="twitter:description" content="TINYLISP Terminal is a web-based Lisp interpreter. Write and execute Lisp code directly in your browser. Learn more about TINYLISP and its features.">
+    <meta name="twitter:image" content="https://github.com/daneelsan/tinylisp/blob/main/screenshot.png">
+
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "TINYLISP Terminal",
+        "description": "A web-based Lisp interpreter for writing and executing Lisp code directly in your browser.",
+        "url": "https://daneelsan.github.io/tinylisp/",
+        "applicationCategory": "Developer Tools",
+        "operatingSystem": "Web",
+        "screenshot": "https://github.com/daneelsan/tinylisp/blob/main/screenshot.png",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
 </head>
 
 <body>
     <div id="terminal">
         <div id="output">
+            <!-- Banner with Semantic HTML -->
             <div id="banner">Welcome to <a href="https://github.com/daneelsan/tinylisp/blob/main/README.md" target="_blank">TINYLISP</a>!</div>
         </div>
         <div id="input-line">
             <span id="prompt">> </span>
-            <input type="text" id="input" autofocus>
+            <input type="text" id="input" autofocus aria-label="Enter Lisp command">
         </div>
     </div>
     <script src="script.js"></script>
