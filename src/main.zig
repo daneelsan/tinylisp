@@ -7,6 +7,6 @@ pub fn main() anyerror!void {
     const writer = std.io.getStdOut().writer().any();
 
     var lisp = tinylisp.Lisp{};
-    lisp.init(reader, writer);
-    try lisp.repl();
+    lisp.init(writer);
+    try lisp.repl(reader);
 }

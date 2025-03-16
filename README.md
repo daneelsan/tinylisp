@@ -1,6 +1,10 @@
 # tinylisp
 
+Play with tinylisp at: https://daneelsan.github.io/tinylisp/
+
 tinylisp is a minimal Lisp interpreter implemented in Zig, using NaN boxing for efficient memory representation. It supports core Lisp features like atoms, lists, conditionals, arithmetic, and closures, along with an interactive REPL and debugging tools for inspecting the heap, stack, and environment.
+
+![dodgeballz](./screenshot.png)
 
 ## Documentation
 
@@ -349,15 +353,23 @@ $ zig version
 0.14.0
 ```
 
-Build the executable using `zig build`:
+Build the wasm executable using `zig build`:
 ```shell
-$ zig build
+$ zig build local
 
 $ ls zig-out/bin
-tinylisp
+tinylisp.wasm
 ```
 
-Or run it directly using `zig build run`:
+Additionally, build the local executable using `zig build local`:
+```shell
+$ zig build local
+
+$ ls zig-out/bin
+tinylisp      tinylisp.wasm
+```
+
+Or run the local executable directly using `zig build run`:
 ```shell
 $ zig build run
 In[]:=
@@ -365,7 +377,7 @@ In[]:=
 
 ## TODO:
 
-- [ ] Compile to .wasm and add a javascript REPL
+- [X] Compile to .wasm and add a javascript REPL
 - [ ] Add more tests
 - [ ] Expand documentation
 

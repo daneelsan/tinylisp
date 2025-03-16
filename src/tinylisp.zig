@@ -2,7 +2,6 @@ const std = @import("std");
 const debug = std.debug;
 const assert = debug.assert;
 const io = std.io;
-// const build_options = @import("build_options");
 
 const Tokenizer = @import("tokenizer.zig").Tokenizer;
 const Token = @import("tokenizer.zig").Token;
@@ -61,7 +60,6 @@ fn not(x: Expr) bool {
 var nil: Expr = box(NIL, 0);
 
 pub const Lisp = struct {
-    reader: io.AnyReader = undefined,
     writer: io.AnyWriter = undefined,
 
     /// cell[N] array of Lisp expressions, shared by the stack and atom heap
@@ -71,9 +69,9 @@ pub const Lisp = struct {
     heap: []u8 = undefined,
 
     /// heap pointer, heap+hp with hp=0 points to the first atom string in stack[]
-    heap_ptr: I = 0,
+    heap_ptr: usize = 0,
     /// stack pointer, the stack starts at the top of stack[] with sp=N
-    stack_ptr: I = N,
+    stack_ptr: usize = N,
 
     err: Expr = undefined,
     tru: Expr = undefined,
@@ -81,10 +79,9 @@ pub const Lisp = struct {
 
     // TODO: make this configurable via build.zig
     /// number of cells for the shared stack and atom heap, increase N as desired
-    const N = 256;
+    const N = 1024;
 
-    pub fn init(l: *Lisp, reader: io.AnyReader, writer: io.AnyWriter) void {
-        l.reader = reader;
+    pub fn init(l: *Lisp, writer: anytype) void {
         l.writer = writer;
 
         //l.heap = @as([*]u8, @ptrCast(@alignCast(l.stack[0..])))[0 .. l.stack.len * @sizeOf(Expr)];
@@ -111,14 +108,23 @@ pub const Lisp = struct {
         }
     }
 
+    // Utils ----------------------------------------------------------------
+    fn readStack(l: Lisp, x: I) Expr {
+        return l.stack[@intCast(x)];
+    }
+
+    fn primitive_fun(x: I) PrimitiveFunction {
+        return primitive_funs[@intCast(x)];
+    }
+
     // Core ----------------------------------------------------------------
 
     /// interning of atom names (Lisp symbols), returns a unique NaN-boxed ATOM
     fn atom(l: *Lisp, str: []const u8) Expr {
-        var i: I = 0;
+        var i: usize = 0;
         while (i < l.heap_ptr) {
             if (std.mem.eql(u8, l.heap[i .. i + str.len], str)) {
-                return box(ATOM, i);
+                return box(ATOM, @intCast(i));
             } else {
                 i += strlen(l.heap[i..]) + 1;
             }
@@ -137,7 +143,8 @@ pub const Lisp = struct {
 
     fn atomName(l: *Lisp, x: Expr) []const u8 {
         assert(tag(x) == ATOM);
-        return std.mem.sliceTo(l.heap[ord(x)..], 0);
+        const i: usize = @intCast(ord(x));
+        return std.mem.sliceTo(l.heap[i..], 0);
     }
 
     /// construct pair (x . y) returns a NaN-boxed CONS
@@ -152,12 +159,12 @@ pub const Lisp = struct {
 
     /// return the car of a pair or ERR if not a pair
     fn car(l: *Lisp, x: Expr) Expr {
-        return if ((tag(x) & ~(CONS ^ CLOS)) == CONS) l.stack[ord(x) + 1] else l.err;
+        return if ((tag(x) & ~(CONS ^ CLOS)) == CONS) l.readStack(ord(x) + 1) else l.err;
     }
 
     /// return the cdr of a pair or ERR if not a pair
     fn cdr(l: *Lisp, x: Expr) Expr {
-        return if ((tag(x) & ~(CONS ^ CLOS)) == CONS) l.stack[ord(x)] else l.err;
+        return if ((tag(x) & ~(CONS ^ CLOS)) == CONS) l.readStack(ord(x)) else l.err;
     }
 
     /// construct a pair to add to environment e, returns the list ((v . x) . e))
@@ -189,7 +196,7 @@ pub const Lisp = struct {
 
     fn apply(l: *Lisp, f: Expr, t: Expr, env: Expr) Expr {
         return switch (tag(f)) {
-            PRIM => primitive_funs[ord(f)].fun(l, t, env),
+            PRIM => primitive_fun(ord(f)).fun(l, t, env),
             CLOS => l.reduce(f, t, env),
             else => l.err,
         };
@@ -543,7 +550,7 @@ pub const Lisp = struct {
 
     fn printPRIM(l: *Lisp, x: Expr) !void {
         assert(tag(x) == PRIM);
-        try l.writer.print("< {s} >", .{primitive_funs[ord(x)].sym});
+        try l.writer.print("< {s} >", .{primitive_fun(ord(x)).sym});
     }
 
     fn printCONS(l: *Lisp, x: Expr) !void {
@@ -637,7 +644,7 @@ pub const Lisp = struct {
         try l.writer.print("|----------|--------|----------|--------------\n", .{});
 
         var counter: usize = 0;
-        var sp: I = N;
+        var sp: usize = N;
         while (sp > l.stack_ptr) : (counter += 1) {
             try l.writer.print("|   {:>5}  |", .{N - counter});
             sp -= 1;
@@ -645,7 +652,7 @@ pub const Lisp = struct {
             switch (tag(x)) {
                 NIL => try l.writer.print("  NIL   |   {:>5}  |  {s}\n", .{ ord(x), "()" }),
                 ATOM => try l.writer.print("  ATOM  |  0x{X:0>4}  |  {s}\n", .{ ord(x), l.atomName(x) }),
-                PRIM => try l.writer.print("  PRIM  |   {:>5}  |  <{s}>\n", .{ ord(x), primitive_funs[ord(x)].sym }),
+                PRIM => try l.writer.print("  PRIM  |   {:>5}  |  <{s}>\n", .{ ord(x), primitive_fun(ord(x)).sym }),
                 CONS => try l.writer.print("  CONS  |   {:>5}  |\n", .{ord(x)}),
                 CLOS => try l.writer.print("  CLOS  |   {:>5}  |\n", .{ord(x)}),
                 else => try l.writer.print("        |          |  {d:<.10}\n", .{x}),
@@ -668,8 +675,8 @@ pub const Lisp = struct {
         try l.writer.print(")\n", .{});
     }
 
-    fn printReplOutput(l: *Lisp, expr: Expr) !void {
-        try l.writer.print("Out[]= ", .{});
+    pub fn printReplOutput(l: *Lisp, comptime out: []const u8, expr: Expr) !void {
+        try l.writer.print(out, .{});
         // TODO: Implement Expr formatter
         try l.printExpr(expr);
         try l.writer.print("\n\n", .{});
@@ -684,28 +691,28 @@ pub const Lisp = struct {
         return l.eval(parsed_expr, l.env);
     }
 
-    pub fn repl(l: *Lisp) !void {
+    pub fn repl(l: *Lisp, reader: io.AnyReader) !void {
         const max_buffer_size = 1024; // TODO: use build options
         while (true) {
             defer l.garbageCollect();
             try l.writer.print("In[]:= ", .{});
             // Read input
             var buffer = try std.BoundedArray(u8, max_buffer_size).init(0);
-            try l.reader.streamUntilDelimiter(buffer.writer(), '\n', max_buffer_size);
+            try reader.streamUntilDelimiter(buffer.writer(), '\n', max_buffer_size);
             try buffer.append(0);
             const line = buffer.slice();
             // Tokenize, parse and evaluate code
             const eval_expr = l.run(line[0 .. line.len - 1 :0]) orelse l.err;
             // Print result
-            try l.printReplOutput(eval_expr);
+            try l.printReplOutput("Out[]= ", eval_expr);
         }
     }
 };
 
 // Utilities -------------------------------------------------------------------
 
-fn strlen(ptr: []u8) I {
-    var i: I = 0;
+fn strlen(ptr: []u8) usize {
+    var i: usize = 0;
     while (ptr[i] != 0) {
         i += 1;
     }
@@ -728,11 +735,10 @@ test "tinylisp - cons" {
 }
 
 fn testExprTag(source: [:0]const u8, expected_expr_tag: I) !void {
-    const reader = std.io.getStdIn().reader().any();
     const writer = std.io.getStdOut().writer().any();
 
     var lisp = Lisp{};
-    lisp.init(reader, writer);
+    lisp.init(writer);
     const eval_expr = lisp.run(source) orelse lisp.err;
     try std.testing.expectEqual(tag(eval_expr), expected_expr_tag);
 }
