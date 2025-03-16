@@ -9,7 +9,7 @@ const WASM = {
 
     async initialize() {
         try {
-            const response = await fetch("../zig-out/bin/tinylisp.wasm");
+            const response = await fetch("./zig-out/bin/tinylisp.wasm");
             const wasmModule = await WebAssembly.instantiateStreaming(response, this.importObject);
             this.instance = wasmModule.instance;
             this.instance.exports.tinylisp_init();
