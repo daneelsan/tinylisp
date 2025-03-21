@@ -383,17 +383,26 @@ tinylisp      tinylisp.wasm
 Or run the local executable directly using `zig build run`:
 ```shell
 $ zig build run
-In[]:=
+λ 
 ```
 
 ## TODO:
 
+### General
 - [X] Compile to .wasm and add a javascript REPL
-- [ ] Add more tests
-- [ ] Expand documentation
-- [ ] `Ctrl+c` to delete the current line
-- [ ] Multiline inputs don't work well with the history explorer (`Up Arrow`)
+- [X] Write a blogpost
+- [ ] Expand documentation with more examples
+
+### Zig
+- [ ] Add tests
 - [ ] Improve parsing to handle multiple expressions separed by new lines
+
+### Terminal
+- [X] `Ctrl+c` to delete the current line
+- [ ] Multiline inputs don't work well with the history explorer (`Up Arrow`)
+- [ ] Syntax highlighting
+- [ ] Drop files
+- [ ] Click to copy input/output
 
 ## Resources
 - [Lisp in 99 lines of C and how to write one yourself - Robert-van-Engelen](https://github.com/Robert-van-Engelen/tinylisp#lisp-in-99-lines-of-c-and-how-to-write-one-yourself)
