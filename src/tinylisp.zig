@@ -395,6 +395,17 @@ pub const Lisp = struct {
         return l.car(t);
     }
 
+    /// (progn (x1 x2 ...)) evaluates each x$i, returning the last one
+    fn f_progn(l: *Lisp, t: Expr, env: Expr) Expr {
+        var result = nil;
+        var current = t;
+        while (tag(current) == CONS) {
+            result = l.eval(l.car(current), env);
+            current = l.cdr(current);
+        }
+        return result;
+    }
+
     fn f_print_heap(l: *Lisp, t: Expr, env: Expr) Expr {
         _ = t;
         _ = env;
@@ -458,6 +469,7 @@ pub const Lisp = struct {
         .{ .sym = "if", .fun = f_if },
         .{ .sym = "lambda", .fun = f_lambda },
         .{ .sym = "define", .fun = f_define },
+        .{ .sym = "progn", .fun = f_progn },
 
         // debugging
         .{ .sym = "print-heap", .fun = f_print_heap },
