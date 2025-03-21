@@ -4,7 +4,9 @@ Play with tinylisp at: https://daneelsan.github.io/tinylisp/
 
 tinylisp is a minimal Lisp interpreter implemented in Zig, using NaN boxing for efficient memory representation. It supports core Lisp features like atoms, lists, conditionals, arithmetic, and closures, along with an interactive REPL and debugging tools for inspecting the heap, stack, and environment.
 
-![dodgeballz](./screenshot.png)
+![TINYLISP](./screenshot.png)
+
+Read my thoughts at https://daneelsan.github.io/2025/03/20/tinylisp.html
 
 ## Documentation
 
@@ -389,8 +391,13 @@ In[]:=
 - [X] Compile to .wasm and add a javascript REPL
 - [ ] Add more tests
 - [ ] Expand documentation
+- [ ] `Ctrl+c` to delete the current line
+- [ ] Multiline inputs don't work well with the history explorer (`Up Arrow`)
+- [ ] Improve parsing to handle multiple expressions separed by new lines
 
 ## Resources
-* [Lisp in 99 lines of C and how to write one yourself - Robert-van-Engelen](https://github.com/Robert-van-Engelen/tinylisp#lisp-in-99-lines-of-c-and-how-to-write-one-yourself)
+- [Lisp in 99 lines of C and how to write one yourself - Robert-van-Engelen](https://github.com/Robert-van-Engelen/tinylisp#lisp-in-99-lines-of-c-and-how-to-write-one-yourself)
 
-* [Passing strings to and from WebAssembly using C](https://log.schemescape.com/posts/webassembly/passing-strings-to-c.html)
+- [Passing strings to and from WebAssembly using C](https://log.schemescape.com/posts/webassembly/passing-strings-to-c.html)
+
+- [TINYLISP: A Minimal Lisp Interpreter in Zig and WebAssembly](https://daneelsan.github.io/2025/03/20/tinylisp.html)
