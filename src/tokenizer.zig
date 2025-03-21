@@ -76,7 +76,9 @@ pub const Tokenizer = struct {
         integer,
         integer_dot,
         invalid,
+        line_comment,
         real_fractional_part,
+        semicolon,
         start,
         symbol,
     };
@@ -115,6 +117,7 @@ pub const Tokenizer = struct {
                     result.loc.start = self.index;
                     continue :state .start;
                 },
+                ';' => continue :state .semicolon,
                 '.' => {
                     result.tag = .dot;
                     self.index += 1;
@@ -173,11 +176,42 @@ pub const Tokenizer = struct {
                 }
             },
 
+            .line_comment => {
+                self.index += 1;
+                switch (self.buffer[self.index]) {
+                    0 => {
+                        if (self.index != self.buffer.len) {
+                            continue :state .invalid;
+                        } else return .{
+                            .tag = .eof,
+                            .loc = .{
+                                .start = self.index,
+                                .end = self.index,
+                            },
+                        };
+                    },
+                    '\n' => {
+                        self.index += 1;
+                        result.loc.start = self.index;
+                        continue :state .start;
+                    },
+                    else => continue :state .line_comment,
+                }
+            },
+
             .real_fractional_part => {
                 self.index += 1;
                 switch (self.buffer[self.index]) {
                     '0'...'9' => continue :state .real_fractional_part,
                     else => result.tag = .real,
+                }
+            },
+
+            .semicolon => {
+                self.index += 1;
+                switch (self.buffer[self.index]) {
+                    ';' => continue :state .line_comment,
+                    else => continue :state .invalid,
                 }
             },
 
